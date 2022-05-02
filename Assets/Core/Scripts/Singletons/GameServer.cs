@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
+using Core.Scripts.Helpers;
 using Core.Scripts.Networking;
-using Core.Scripts.Networking.Registries;
+using Core.Scripts.Registries;
 
 using KableNet.Common;
 using KableNet.Math;
@@ -10,15 +11,17 @@ using KableNet.Server;
 
 using UnityEngine;
 
+using PacketRegistry = Core.Scripts.Networking.Registries.PacketRegistry;
+
 namespace Core.Scripts.Singletons
 {
     public static class GameServer
     {
         /// <summary>
-        /// Initializes and Starts the GameServer
+        /// Starts the GameServer
         /// </summary>
         /// <param name="port"></param>
-        public static void Init( int port )
+        public static void Start( int port )
         {
             // Check if server is already running
             if ( serverRunning )
@@ -40,9 +43,23 @@ namespace Core.Scripts.Singletons
             connection.PacketReadyEvent += OnClientPacketReady;
             Debug.LogError( $"[GameServer][OnKableConnection] New Connection..." );
             NetPlayer netPlr = new NetPlayer( connection );
-            lock ( _playerList )
+            lock ( PlayerList )
             {
-                _playerList.Add( netPlr.NetId, netPlr );
+                PlayerList.Add( netPlr.NetId, netPlr );
+            }
+            
+            GameObject plrObj = GameObject.Instantiate( PrefabRegistry.GetPrefab( new Identifier( "core", "entity_player" ) ) );
+            ServerEntity servEnt = plrObj.GetComponent<ServerEntity>( );
+            if ( servEnt == null )
+            {
+                Debug.LogError( "entity_player has no ServerEntity component!" );
+            }
+
+            servEnt.Initialize( netPlr.NetId );
+            
+            lock ( EntityList )
+            {
+                EntityList.Add( netPlr.NetId, servEnt );
             }
         }
         private static void OnClientPacketReady( KablePacket packet, KableConnection source )
@@ -63,11 +80,14 @@ namespace Core.Scripts.Singletons
         /// <returns></returns>
         public static NetPlayer ToNetPlayer( KableConnection conn )
         {
-            foreach (KeyValuePair<NetId,NetPlayer> i in _playerList)
+            lock ( PlayerList )
             {
-                if ( i.Value.ConnectionMatches( conn ) )
+                foreach (KeyValuePair<NetId,NetPlayer> i in PlayerList)
                 {
-                    return i.Value;
+                    if ( i.Value.ConnectionMatches( conn ) )
+                    {
+                        return i.Value;
+                    }
                 }
             }
 
@@ -81,11 +101,14 @@ namespace Core.Scripts.Singletons
         /// <returns></returns>
         public static NetPlayer FindNetPlayer( NetId searchNetId )
         {
-            foreach (KeyValuePair<NetId,NetPlayer> i in _playerList)
+            lock ( PlayerList )
             {
-                if ( i.Key == searchNetId )
+                foreach (KeyValuePair<NetId, NetPlayer> i in PlayerList)
                 {
-                    return i.Value;
+                    if ( i.Key == searchNetId )
+                    {
+                        return i.Value;
+                    }
                 }
             }
 
@@ -94,27 +117,36 @@ namespace Core.Scripts.Singletons
         
         internal static void UnityTick( )
         {
-            foreach (KeyValuePair<NetId,NetPlayer> pair in _playerList)
+            lock ( PlayerList )
             {
-                pair.Value.KableConnection.ProcessBuffer(  );
+                foreach (KeyValuePair<NetId, NetPlayer> pair in PlayerList)
+                {
+                    pair.Value.KableConnection.ProcessBuffer( );
+                }
             }
         }
         internal static void Shutdown( )
         {
-            foreach (KeyValuePair<NetId,NetPlayer> pair in _playerList)
+            lock ( PlayerList )
             {
-                try
+                foreach (KeyValuePair<NetId, NetPlayer> pair in PlayerList)
                 {
-                    pair.Value.KableConnection.Close(  );
+                    try
+                    {
+                        pair.Value.KableConnection.Close( );
+                    }
+                    catch
+                    {
+                    }
                 }
-                catch {  }
             }
         }
 
         public static int serverPort { get; private set; }
         public static bool serverRunning { get; private set; } = false;
 
-        private static Dictionary<NetId, NetPlayer> _playerList = new Dictionary<NetId, NetPlayer>( );
+        readonly private static Dictionary<NetId, NetPlayer> PlayerList = new Dictionary<NetId, NetPlayer>( );
+        readonly private static Dictionary<NetId, ServerEntity> EntityList = new Dictionary<NetId, ServerEntity>( );
 
         private static KableServer _kableServer;
     }

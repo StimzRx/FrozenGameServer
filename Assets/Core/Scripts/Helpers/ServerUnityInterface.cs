@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Core.Scripts.Helpers;
+using Core.Scripts.Registries;
 using Core.Scripts.Singletons;
 
 using UnityEngine;
@@ -8,7 +10,9 @@ public class ServerUnityInterface : MonoBehaviour
 {
     void Start( )
     {
-        GameServer.Init( 5665 );
+        PrefabRegistry.Initialize( prefabReferences );
+        
+        GameServer.Start( 5665 );
     }
 
     private void Update( )
@@ -20,4 +24,6 @@ public class ServerUnityInterface : MonoBehaviour
     {
         GameServer.Shutdown(  );
     }
+
+    [SerializeField] public PrefabReference[ ] prefabReferences;
 }
