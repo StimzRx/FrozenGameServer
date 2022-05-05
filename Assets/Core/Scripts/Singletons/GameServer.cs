@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+using Core.Scripts.Entities;
 using Core.Scripts.Helpers;
 using Core.Scripts.Networking;
 using Core.Scripts.Registries;
@@ -43,23 +44,24 @@ namespace Core.Scripts.Singletons
             connection.PacketReadyEvent += OnClientPacketReady;
             Debug.LogError( $"[GameServer][OnKableConnection] New Connection..." );
             NetPlayer netPlr = new NetPlayer( connection );
-            lock ( PlayerList )
+            lock ( NetClients )
             {
-                PlayerList.Add( netPlr.NetId, netPlr );
+                NetClients.Add( netPlr.NetId, netPlr );
             }
             
             GameObject plrObj = GameObject.Instantiate( PrefabRegistry.GetPrefab( new Identifier( "core", "entity_player" ) ) );
-            ServerEntity servEnt = plrObj.GetComponent<ServerEntity>( );
-            if ( servEnt == null )
-            {
-                Debug.LogError( "entity_player has no ServerEntity component!" );
-            }
-
-            servEnt.Initialize( netPlr.NetId );
+            EntityWrapper wrapper = plrObj.GetComponent<EntityWrapper>( );
             
-            lock ( EntityList )
+            if ( wrapper == null )
             {
-                EntityList.Add( netPlr.NetId, servEnt );
+                Debug.LogError( "entity_player has no EntityWrapper component!" );
+            }
+            
+            ServerPlayer servPlr = new ServerPlayer( wrapper, netPlr.NetId, netPlr );
+            
+            lock ( WorldEntities )
+            {
+                WorldEntities.Add( netPlr.NetId, servPlr );
             }
         }
         private static void OnClientPacketReady( KablePacket packet, KableConnection source )
@@ -80,9 +82,9 @@ namespace Core.Scripts.Singletons
         /// <returns></returns>
         public static NetPlayer ToNetPlayer( KableConnection conn )
         {
-            lock ( PlayerList )
+            lock ( NetClients )
             {
-                foreach (KeyValuePair<NetId,NetPlayer> i in PlayerList)
+                foreach (KeyValuePair<NetId,NetPlayer> i in NetClients)
                 {
                     if ( i.Value.ConnectionMatches( conn ) )
                     {
@@ -101,9 +103,9 @@ namespace Core.Scripts.Singletons
         /// <returns></returns>
         public static NetPlayer FindNetPlayer( NetId searchNetId )
         {
-            lock ( PlayerList )
+            lock ( NetClients )
             {
-                foreach (KeyValuePair<NetId, NetPlayer> i in PlayerList)
+                foreach (KeyValuePair<NetId, NetPlayer> i in NetClients)
                 {
                     if ( i.Key == searchNetId )
                     {
@@ -117,9 +119,9 @@ namespace Core.Scripts.Singletons
         
         internal static void UnityTick( )
         {
-            lock ( PlayerList )
+            lock ( NetClients )
             {
-                foreach (KeyValuePair<NetId, NetPlayer> pair in PlayerList)
+                foreach (KeyValuePair<NetId, NetPlayer> pair in NetClients)
                 {
                     pair.Value.KableConnection.ProcessBuffer( );
                 }
@@ -127,9 +129,9 @@ namespace Core.Scripts.Singletons
         }
         internal static void Shutdown( )
         {
-            lock ( PlayerList )
+            lock ( NetClients )
             {
-                foreach (KeyValuePair<NetId, NetPlayer> pair in PlayerList)
+                foreach (KeyValuePair<NetId, NetPlayer> pair in NetClients)
                 {
                     try
                     {
@@ -145,8 +147,8 @@ namespace Core.Scripts.Singletons
         public static int serverPort { get; private set; }
         public static bool serverRunning { get; private set; } = false;
 
-        readonly private static Dictionary<NetId, NetPlayer> PlayerList = new Dictionary<NetId, NetPlayer>( );
-        readonly private static Dictionary<NetId, ServerEntity> EntityList = new Dictionary<NetId, ServerEntity>( );
+        readonly private static Dictionary<NetId, NetPlayer> NetClients = new Dictionary<NetId, NetPlayer>( );
+        readonly private static Dictionary<NetId, ServerEntity> WorldEntities = new Dictionary<NetId, ServerEntity>( );
 
         private static KableServer _kableServer;
     }

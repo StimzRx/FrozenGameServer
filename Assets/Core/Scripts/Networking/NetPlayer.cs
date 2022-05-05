@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Net.Sockets;
 
+using Core.Scripts.Entities;
+using Core.Scripts.Events.Entity;
+using Core.Scripts.Networking.Packets.Core;
+
 using KableNet.Common;
 using KableNet.Math;
 
@@ -17,9 +21,18 @@ namespace Core.Scripts.Networking
             KableConnection.ConnectErroredEvent += OnConnectFailure;
             KableConnection.ConnectionErroredEvent += OnKableError;
 
+            ServerEntityEvents.EntitySpawned += OnEntitySpawn;
+
             this.NetId = NetId.Generate( );
         }
-        
+        private void OnEntitySpawn( ServerEntity entity, Vector3 position )
+        {
+            if ( entity is ServerPlayer )
+            {
+                KableConnection.SendPacketTCPAsync( new SpawnEntityPacket( new Identifier( "core", "player_entity" ), entity.NetId ).GetAsPacket( ) ).Wait( );
+            }
+        }
+
         private void OnConnected( KableConnection source )
         {
             Debug.LogError( $"[ServerPlayer.{ this.NetId }] Connected!" );
@@ -39,6 +52,7 @@ namespace Core.Scripts.Networking
         }
 
         internal KableConnection KableConnection { get; private set; }
+        
         public NetId NetId { get; protected set; }
     }
 }

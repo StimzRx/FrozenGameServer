@@ -1,28 +1,32 @@
-using System.Collections;
-using System.Collections.Generic;
+﻿using Core.Scripts.Events.Entity;
 
 using KableNet.Math;
 
 using UnityEngine;
 
-public class ServerEntity : MonoBehaviour
+namespace Core.Scripts.Entities
 {
-    // Start is called before the first frame update
-    void Start()
+    public class ServerEntity
     {
+        public ServerEntity( EntityWrapper wrapper, NetId netId )
+        {
+            this.NetId = netId;
+            this.WrapperComponent = wrapper;
+            this.WrapperObject = wrapper.gameObject;
+        }
         
-    }
+        internal virtual void ServerSpawned( )
+        {
+            ServerEntityEvents.InvokeOnEntitySpawn( this, WrapperObject.transform.position );
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
+        internal virtual void ServerTick( float deltaTime )
+        {
+            
+        }
         
+        public NetId NetId { get; protected set; }
+        public EntityWrapper WrapperComponent { get; private set; }
+        public GameObject WrapperObject { get; private set; }
     }
-
-    internal void Initialize( NetId netId )
-    {
-        this.NetId = netId;
-    }
-    
-    public NetId NetId { get; private set; }
 }
