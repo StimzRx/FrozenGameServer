@@ -6,6 +6,9 @@ using Core.Scripts.Singletons;
 
 using UnityEngine;
 
+/// <summary>
+/// A really jank class meant to interface Unity's events with our (equally jank) custom Game
+/// </summary>
 public class ServerUnityInterface : MonoBehaviour
 {
     void Start( )

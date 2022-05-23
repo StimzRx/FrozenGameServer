@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace Core.Scripts.Networking.Handlers.Core
 {
+    /// <summary>
+    /// "Authentication" packet's handler
+    /// </summary>
     public class AuthMeHandler : KableHandler
     {
         public override void HandlePacket( KablePacket p, KableConnection src )

@@ -12,10 +12,11 @@ using KableNet.Server;
 
 using UnityEngine;
 
-using PacketRegistry = Core.Scripts.Networking.Registries.PacketRegistry;
-
 namespace Core.Scripts.Singletons
 {
+    /// <summary>
+    /// Represents a server's game state. Especially in regards to networking
+    /// </summary>
     public static class GameServer
     {
         /// <summary>
@@ -39,6 +40,11 @@ namespace Core.Scripts.Singletons
 
             Debug.Log( "Started server!" );
         }
+        
+        /// <summary>
+        /// Triggered when a new client connects to this server
+        /// </summary>
+        /// <param name="connection"></param>
         private static void OnKableConnection( KableConnection connection )
         {
             connection.PacketReadyEvent += OnClientPacketReady;
@@ -64,12 +70,24 @@ namespace Core.Scripts.Singletons
                 WorldEntities.Add( netPlr.NetId, servPlr );
             }
         }
+        
+        /// <summary>
+        /// Called whenever a KableConnection has a packet that is ready to be processed
+        /// </summary>
+        /// <param name="packet">Unread KablePacket</param>
+        /// <param name="source">Source KableConnection</param>
         private static void OnClientPacketReady( KablePacket packet, KableConnection source )
         {
             Debug.LogError( $"[GameServer] Packet ready with '{ packet.Count }' bytes." );
 
-            PacketRegistry.HandlePacket( packet, source );
+            Identifier packetIdent = packet.ReadIdentifier( );
+            
+            PacketRegistry.TriggerHandler( packetIdent, packet, source );
         }
+        /// <summary>
+        /// Triggered when a runtime error occurs during read/write of a KableConnection
+        /// </summary>
+        /// <param name="errormessage"></param>
         private static void OnKableConnectionErrored( string errormessage )
         {
             Debug.LogError( $"[GameServer][OnKableConnectionErrored]{ errormessage }" );
@@ -86,7 +104,7 @@ namespace Core.Scripts.Singletons
             {
                 foreach (KeyValuePair<NetId,NetPlayer> i in NetClients)
                 {
-                    if ( i.Value.ConnectionMatches( conn ) )
+                    if ( i.Value.DoesKableConnectionMatch( conn ) )
                     {
                         return i.Value;
                     }
@@ -117,6 +135,9 @@ namespace Core.Scripts.Singletons
             return null;
         }
         
+        /// <summary>
+        /// Called whenever Unity has a game tick (every frame)
+        /// </summary>
         internal static void UnityTick( )
         {
             lock ( NetClients )
@@ -127,6 +148,10 @@ namespace Core.Scripts.Singletons
                 }
             }
         }
+        
+        /// <summary>
+        /// Called when Unity is shutting down
+        /// </summary>
         internal static void Shutdown( )
         {
             lock ( NetClients )

@@ -1,10 +1,13 @@
-﻿using KableNet.Common;
+﻿using Core.Scripts.Attributes;
+
+using KableNet.Common;
 using KableNet.Math;
 
 using UnityEditor.Build.Content;
 
 namespace Core.Scripts.Networking.Packets.Core
 {
+    [NetPacket("core", "spawn_entity_packet")]
     public class SpawnEntityPacket : PacketWrapper
     {
         public SpawnEntityPacket( Identifier entityIdent, NetId netId )
@@ -22,6 +25,6 @@ namespace Core.Scripts.Networking.Packets.Core
             p.Write( NetId );
         }
 
-        public override Identifier identifier => new Identifier( "core", "spawn_entity_packet" );
+        //public override Identifier identifier => new Identifier( "core", "spawn_entity_packet" );
     }
 }

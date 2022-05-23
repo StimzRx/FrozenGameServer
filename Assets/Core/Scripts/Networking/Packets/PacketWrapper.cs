@@ -3,6 +3,9 @@ using KableNet.Math;
 
 namespace Core.Scripts.Networking.Packets
 {
+    /// <summary>
+    /// The base type for all NetworkPackets'
+    /// </summary>
     public abstract class PacketWrapper
     {
         /// <summary>

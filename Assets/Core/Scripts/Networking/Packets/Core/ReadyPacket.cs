@@ -1,8 +1,12 @@
-﻿using KableNet.Common;
+﻿using Core.Scripts.Attributes;
+
+using KableNet.Common;
 using KableNet.Math;
 
 namespace Core.Scripts.Networking.Packets.Core
 {
+
+    [NetPacket("core", "ready_packet")]
     public class ReadyPacket : PacketWrapper
     {
 
@@ -12,6 +16,6 @@ namespace Core.Scripts.Networking.Packets.Core
             // Identifier, which is handled in the background
         }
 
-        public override Identifier identifier { get { return new Identifier( "core", "ready" ); } }
+        //public override Identifier identifier { get { return new Identifier( "core", "ready" ); } }
     }
 }

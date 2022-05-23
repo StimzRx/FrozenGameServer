@@ -9,7 +9,10 @@ using UnityEngine;
 
 namespace Core.Scripts.Registries
 {
-    public class PrefabRegistry
+    /// <summary>
+    /// Handles registration and retrieval of preset GameObject prefabs'
+    /// </summary>
+    public static class PrefabRegistry
     {
         internal static void Initialize( PrefabReference[] references )
         {

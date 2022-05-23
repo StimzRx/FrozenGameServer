@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace Core.Scripts.Helpers
 {
+    /// <summary>
+    /// A reference to a Prefab for making references in the UnityEditor
+    /// </summary>
     [Serializable]
     public class PrefabReference
     {

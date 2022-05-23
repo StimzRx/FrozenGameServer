@@ -12,6 +12,9 @@ using UnityEngine;
 
 namespace Core.Scripts.Networking
 {
+    /// <summary>
+    /// Represents a 'client' of our server. Should be paired with a ServerPlayer type, which handles our in-world code
+    /// </summary>
     public class NetPlayer
     {
         public NetPlayer( KableConnection connection )
@@ -21,10 +24,12 @@ namespace Core.Scripts.Networking
             KableConnection.ConnectErroredEvent += OnConnectFailure;
             KableConnection.ConnectionErroredEvent += OnKableError;
 
-            ServerEntityEvents.EntitySpawned += OnEntitySpawn;
+            ServerEntityEvents.EntitySpawnEvent += OnEntitySpawn;
 
             this.NetId = NetId.Generate( );
         }
+        
+        // ------------ Subscribed Events ------------
         private void OnEntitySpawn( ServerEntity entity, Vector3 position )
         {
             if ( entity is ServerPlayer )
@@ -32,21 +37,44 @@ namespace Core.Scripts.Networking
                 KableConnection.SendPacketTCPAsync( new SpawnEntityPacket( new Identifier( "core", "player_entity" ), entity.NetId ).GetAsPacket( ) ).Wait( );
             }
         }
+        
+        // -------------------------------------------
 
+        /// <summary>
+        /// Connection to client has been established
+        /// </summary>
+        /// <param name="source"></param>
         private void OnConnected( KableConnection source )
         {
             Debug.LogError( $"[ServerPlayer.{ this.NetId }] Connected!" );
         }
+        
+        /// <summary>
+        /// KableConnection encountered a runtime error during read/write to network stream
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <param name="source"></param>
         private void OnKableError( Exception ex, KableConnection source )
         {
             Debug.LogError( $"[ServerPlayer.{ this.NetId }][KableError]{ ex }" );
         }
+        
+        /// <summary>
+        /// KableConnection failed to be established
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <param name="source"></param>
         private void OnConnectFailure( SocketException exception, KableConnection source )
         {
             Debug.LogError( $"[ServerPlayer.{ this.NetId }][Connect Failure]{ exception }" );
         }
 
-        public bool ConnectionMatches( KableConnection conn )
+        /// <summary>
+        /// Does the given KableConnection match this NetPlayer's KableConnection
+        /// </summary>
+        /// <param name="conn"></param>
+        /// <returns></returns>
+        public bool DoesKableConnectionMatch( KableConnection conn )
         {
             return this.KableConnection == conn;
         }
