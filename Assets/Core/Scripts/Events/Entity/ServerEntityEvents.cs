@@ -11,18 +11,18 @@ namespace Core.Scripts.Events.Entity
         /// <summary>
         /// Triggered whenever a Entity is spawned in the game world.
         /// </summary>
-        public delegate void OnEntitySpawn( ServerEntity entity, Vector3 position );
+        public delegate void OnEntitySpawn( GameEntity entity, Vector3 position );
         public static event OnEntitySpawn EntitySpawnEvent;
-        internal static void InvokeOnEntitySpawn( ServerEntity entity, Vector3 position )
+        internal static void InvokeOnEntitySpawn( GameEntity entity, Vector3 position )
             => EntitySpawnEvent?.Invoke( entity, position );
         
         
         /// <summary>
         /// Triggered whenever a Entity is de-spawned in the game world.
         /// </summary>
-        public delegate void OnEntityDestroyed( ServerEntity entity );
+        public delegate void OnEntityDestroyed( GameEntity entity );
         public static event OnEntityDestroyed EntityDestroyedEvent;
-        internal static void InvokeOnEntityDestroyed( ServerEntity entity )
+        internal static void InvokeOnEntityDestroyed( GameEntity entity )
             => EntityDestroyedEvent?.Invoke( entity );
     }
 }

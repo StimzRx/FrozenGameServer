@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Core.Scripts.Entities;
+using Core.Scripts.Entities.Core;
 using Core.Scripts.Helpers;
 using Core.Scripts.Networking;
 using Core.Scripts.Registries;
@@ -63,7 +64,7 @@ namespace Core.Scripts.Singletons
                 Debug.LogError( "entity_player has no EntityWrapper component!" );
             }
             
-            ServerPlayer servPlr = new ServerPlayer( wrapper, netPlr.NetId, netPlr );
+            PlayerEntity servPlr = new PlayerEntity( netPlr, wrapper, netPlr.NetId );
             
             lock ( WorldEntities )
             {
@@ -158,13 +159,8 @@ namespace Core.Scripts.Singletons
             {
                 foreach (KeyValuePair<NetId, NetPlayer> pair in NetClients)
                 {
-                    try
-                    {
-                        pair.Value.KableConnection.Close( );
-                    }
-                    catch
-                    {
-                    }
+                    // Close down every KableConnection client gracefully (or at least try to)
+                    pair.Value.KableConnection.Close( );
                 }
             }
         }
@@ -173,7 +169,7 @@ namespace Core.Scripts.Singletons
         public static bool serverRunning { get; private set; } = false;
 
         readonly private static Dictionary<NetId, NetPlayer> NetClients = new Dictionary<NetId, NetPlayer>( );
-        readonly private static Dictionary<NetId, ServerEntity> WorldEntities = new Dictionary<NetId, ServerEntity>( );
+        readonly private static Dictionary<NetId, GameEntity> WorldEntities = new Dictionary<NetId, GameEntity>( );
 
         private static KableServer _kableServer;
     }

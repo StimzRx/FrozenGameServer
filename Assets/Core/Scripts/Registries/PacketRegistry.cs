@@ -39,11 +39,19 @@ namespace Core.Scripts.Registries
             
             try
             {
-                tarType.GetMethod( "HandlePacket" )?.Invoke( null, new object[ ]
+                MethodInfo tarMethodInfo = tarType.GetMethod( "HandlePacket" );
+                if ( tarMethodInfo is null )
                 {
-                    p,
-                    conn,
-                } );
+                    Debug.LogError( $"[PacketRegistry.TriggerHandler()] type '' has no static method called 'HandlePacket' with params '(KablePacket, KableConnection)'!" );
+                }
+                else
+                {
+                    tarMethodInfo.Invoke( null, new object[ ]
+                    {
+                        p,
+                        conn,
+                    } );
+                }
             }
             catch ( Exception ex )
             {
@@ -56,7 +64,7 @@ namespace Core.Scripts.Registries
         /// </summary>
         private static List< PacketHandlerRegistryEntry > _handlerRegister = new List <PacketHandlerRegistryEntry >( )
         {
-            //{ PacketHandlerRegistryEntry.Create( typeof(AuthMeHandler) ) }
+            { PacketHandlerRegistryEntry.Create( typeof(AuthMeHandler) ) },
         };
 
         /// <summary>
@@ -64,7 +72,7 @@ namespace Core.Scripts.Registries
         /// </summary>
         private static List<PacketRegistryEntry> _packetRegister = new List<PacketRegistryEntry>()
         {
-            //{ PacketRegistryEntry.Create( typeof(ReadyPacket) ) },
+            { PacketRegistryEntry.Create( typeof(ReadyPacket) ) },
         };
         
         

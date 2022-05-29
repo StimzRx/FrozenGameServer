@@ -107,8 +107,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4306708911242433412}
-  - component: {fileID: 3640445069213271400}
-  - component: {fileID: 4115070321019965299}
   m_Layer: 0
   m_Name: NetPlayer
   m_TagString: Untagged
@@ -132,27 +130,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3640445069213271400
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4964202039200637080}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 841af2752095eef448cfe0fa03cf1f43, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &4115070321019965299
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4964202039200637080}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e89e0961f868b844a407beaefa6ce7b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

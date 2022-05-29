@@ -11,18 +11,18 @@ namespace Core.Scripts.Entities
     {
         private void Start( )
         {
-            ServerEntity.ServerSpawned( );
+            GameEntity.ServerSpawned( );
         }
         private void Update( )
         {
-            ServerEntity.ServerTick( Time.deltaTime );
+            GameEntity.ServerTick( Time.deltaTime );
         }
 
-        public void Initialize( ServerEntity serverEntity )
+        public void Initialize( GameEntity gameEntity )
         {
-            this.ServerEntity = serverEntity;
+            this.GameEntity = gameEntity;
         }
         
-        public ServerEntity ServerEntity { get; private set; }
+        public GameEntity GameEntity { get; private set; }
     }
 }

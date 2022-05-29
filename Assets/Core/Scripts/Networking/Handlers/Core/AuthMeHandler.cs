@@ -1,4 +1,5 @@
-﻿using Core.Scripts.Singletons;
+﻿using Core.Scripts.Attributes;
+using Core.Scripts.Singletons;
 
 using KableNet.Common;
 
@@ -9,9 +10,10 @@ namespace Core.Scripts.Networking.Handlers.Core
     /// <summary>
     /// "Authentication" packet's handler
     /// </summary>
-    public class AuthMeHandler : KableHandler
+    [NetHandler("core", "auth_me")]
+    public class AuthMeHandler
     {
-        public override void HandlePacket( KablePacket p, KableConnection src )
+        public static void HandlePacket( KablePacket p, KableConnection src )
         {
             string versionRaw = p.ReadString( );
             if ( versionRaw != "0.0.1" )
