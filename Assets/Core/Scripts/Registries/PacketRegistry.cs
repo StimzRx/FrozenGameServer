@@ -6,8 +6,10 @@ using System.Reflection;
 using Core.Scripts.Attributes;
 using Core.Scripts.Networking.Handlers;
 using Core.Scripts.Networking.Handlers.Core;
+using Core.Scripts.Networking.Packets;
 using Core.Scripts.Networking.Packets.Core;
 using Core.Scripts.Networking.Registries.Entries;
+using Core.Scripts.Registries.Entries;
 
 using KableNet.Common;
 using KableNet.Math;
@@ -36,27 +38,50 @@ namespace Core.Scripts.Registries
                 Debug.LogError( $"[PacketRegistry.TriggerHandler()]: Invalid KableHandler for { identifier }" );
                 return;
             }
+
+            MethodInfo toInvoke = null;
+            PacketHandler baseHandler = null;
             
-            try
+            bool didFind = false;
+            if ( TriggerCache.ContainsKey( tarType ) )
             {
-                MethodInfo tarMethodInfo = tarType.GetMethod( "HandlePacket" );
-                if ( tarMethodInfo is null )
-                {
-                    Debug.LogError( $"[PacketRegistry.TriggerHandler()] type '' has no static method called 'HandlePacket' with params '(KablePacket, KableConnection)'!" );
-                }
-                else
-                {
-                    tarMethodInfo.Invoke( null, new object[ ]
-                    {
-                        p,
-                        conn,
-                    } );
-                }
+                baseHandler = TriggerCache[ tarType ].BaseHandler;
+                toInvoke = TriggerCache[ tarType ].MethodInfo;
+                
+                didFind = true;
             }
-            catch ( Exception ex )
+
+            baseHandler ??= (PacketHandler)Activator.CreateInstance( tarType );
+            toInvoke ??= tarType.GetMethod( "HandlePacket" );
+
+            if ( !didFind )
             {
-                Debug.LogError( $"[PacketRegistry.TriggerHandler()]: { ex.Message }\nFull:{ ex.ToString(  ) }" );
+                TriggerCache.Add( tarType, new TriggerCacheEntry( baseHandler, toInvoke ) );
             }
+            
+            if ( toInvoke is null )
+            {
+                Debug.LogError( $"[PacketRegistry.TriggerHandler()] type '{ tarType.Namespace }.{ tarType.Name }' has no static method called 'HandlePacket' with params '(KablePacket, KableConnection)'!" );
+            }
+            else
+            {
+                toInvoke.Invoke( baseHandler, new object[ ]
+                {
+                    p,
+                    conn,
+                } );
+            }
+            
+        }
+
+        public static Identifier GetPacketIdentifier<T>( ) where T : PacketWrapper
+        {
+            Identifier ident = _handlerRegister.FirstOrDefault( x => x.EntryType == typeof(T) ).EntryIdentifier;
+            if ( ident is null )
+            {
+                ident = new Identifier( "null", "null" );
+            }
+            return ident;
         }
         
         /// <summary>
@@ -74,7 +99,9 @@ namespace Core.Scripts.Registries
         {
             { PacketRegistryEntry.Create( typeof(ReadyPacket) ) },
         };
-        
-        
+
+        readonly private static Dictionary<Type, TriggerCacheEntry> TriggerCache = new Dictionary<Type, TriggerCacheEntry>( );
+
+
     }
 }

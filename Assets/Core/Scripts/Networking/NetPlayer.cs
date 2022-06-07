@@ -43,7 +43,7 @@ namespace Core.Scripts.Networking
                 }
                 else
                 {
-                    KableConnection.SendPacketTCPAsync( new SpawnEntityPacket( new Identifier( "core", "entity_player" ), entity.NetId ).GetAsPacket( ) ).Wait( );
+                    //KableConnection.SendPacketTCPAsync( new SpawnEntityPacket( new Identifier( "core", "player_entity" ), entity.NetId ).GetAsPacket( ) ).Wait( );
                 }
             }
         }
@@ -57,7 +57,7 @@ namespace Core.Scripts.Networking
                 }
                 else
                 {
-                    KableConnection.SendPacketTCPAsync( new SpawnEntityPacket( new Identifier( "core", "entity_player" ), entity.NetId ).GetAsPacket( ) ).Wait( );
+                    //KableConnection.SendPacketTCPAsync( new SpawnEntityPacket( new Identifier( "core", "entity_player" ), entity.NetId ).GetAsPacket( ) ).Wait( );
                 }
             }
         }

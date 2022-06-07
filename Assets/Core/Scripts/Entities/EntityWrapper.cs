@@ -9,18 +9,15 @@ namespace Core.Scripts.Entities
     /// </summary>
     public class EntityWrapper : MonoBehaviour
     {
-        private void Start( )
-        {
-            GameEntity.ServerSpawned( );
-        }
         private void Update( )
         {
-            GameEntity.ServerTick( Time.deltaTime );
+            GameEntity?.ServerTick( Time.deltaTime );
         }
 
         public void Initialize( GameEntity gameEntity )
         {
             this.GameEntity = gameEntity;
+            GameEntity.ServerSpawned( );
         }
         
         public GameEntity GameEntity { get; private set; }

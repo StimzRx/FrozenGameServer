@@ -24,7 +24,5 @@ namespace Core.Scripts.Networking.Packets.Core
             p.Write( EntityIdentifier );
             p.Write( NetId );
         }
-
-        //public override Identifier identifier => new Identifier( "core", "spawn_entity_packet" );
     }
 }

@@ -1,5 +1,12 @@
-﻿using KableNet.Common;
+﻿using System;
+
+using Core.Scripts.Attributes;
+using Core.Scripts.Registries;
+
+using KableNet.Common;
 using KableNet.Math;
+
+using Unity.VisualScripting;
 
 namespace Core.Scripts.Networking.Packets
 {
@@ -17,14 +24,18 @@ namespace Core.Scripts.Networking.Packets
         internal virtual KablePacket GetAsPacket( )
         {
             KablePacket handoffPacket = new KablePacket( );
+            
+            Identifier tarIdent = new Identifier( "null", "null" );
 
-            /*  The following line will cause a crash if
-             *  a packet class doesnt override the identifier field!
-             *  Allowing it for now, for debugging reasons.
-             * */
+            NetPacket netPacketAttribute = (NetPacket)Attribute.GetCustomAttribute( GetType(  ), typeof(NetPacket) );
 
-            handoffPacket.Write( identifier.path );
-            handoffPacket.Write( identifier.value );
+            if ( netPacketAttribute != null )
+            {
+                tarIdent = new Identifier( netPacketAttribute.IdentifierNamespace, netPacketAttribute.IdentifierPath );
+            }
+            
+            handoffPacket.Write( tarIdent.path );
+            handoffPacket.Write( tarIdent.value );
 
             ToPacket( handoffPacket );
 
@@ -37,11 +48,5 @@ namespace Core.Scripts.Networking.Packets
         /// </summary>
         /// <param name="packet"></param>
         protected abstract void ToPacket( KablePacket p );
-
-        /// <summary>
-        /// The identifier for this packet. Make sure to override this
-        /// as it gets automatically serialized!
-        /// </summary>
-        public virtual Identifier identifier { get; }
     }
 }

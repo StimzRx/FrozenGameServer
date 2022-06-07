@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
 using Core.Scripts.Entities;
 using Core.Scripts.Entities.Core;
+using Core.Scripts.Events.Entity;
 using Core.Scripts.Helpers;
 using Core.Scripts.Networking;
 using Core.Scripts.Registries;
@@ -37,7 +39,16 @@ namespace Core.Scripts.Singletons
             _kableServer = new KableServer( serverPort );
             _kableServer.NewConnectionEvent += OnKableConnection;
             _kableServer.NewConnectionErroredEvent += OnKableConnectionErrored;
-            _kableServer.StartListening(  );
+
+            try
+            {
+                _kableServer.StartListening(  );
+            }
+            catch ( Exception ex )
+            {
+                Console.WriteLine( $"[GameServer.Start]Generic/Unhandled exception in GameServer & KableNet: {ex}" );
+                throw;
+            }
 
             Debug.Log( "Started server!" );
         }
@@ -49,26 +60,11 @@ namespace Core.Scripts.Singletons
         private static void OnKableConnection( KableConnection connection )
         {
             connection.PacketReadyEvent += OnClientPacketReady;
-            Debug.LogError( $"[GameServer][OnKableConnection] New Connection..." );
+            Debug.Log( $"[GameServer][OnKableConnection] New Connection..." );
             NetPlayer netPlr = new NetPlayer( connection );
             lock ( NetClients )
             {
                 NetClients.Add( netPlr.NetId, netPlr );
-            }
-            
-            GameObject plrObj = GameObject.Instantiate( PrefabRegistry.GetPrefab( new Identifier( "core", "entity_player" ) ) );
-            EntityWrapper wrapper = plrObj.GetComponent<EntityWrapper>( );
-            
-            if ( wrapper == null )
-            {
-                Debug.LogError( "entity_player has no EntityWrapper component!" );
-            }
-            
-            PlayerEntity servPlr = new PlayerEntity( netPlr, wrapper, netPlr.NetId );
-            
-            lock ( WorldEntities )
-            {
-                WorldEntities.Add( netPlr.NetId, servPlr );
             }
         }
         
@@ -82,8 +78,16 @@ namespace Core.Scripts.Singletons
             Debug.LogError( $"[GameServer] Packet ready with '{ packet.Count }' bytes." );
 
             Identifier packetIdent = packet.ReadIdentifier( );
-            
-            PacketRegistry.TriggerHandler( packetIdent, packet, source );
+
+            try
+            {
+                PacketRegistry.TriggerHandler( packetIdent, packet, source );
+            }
+            catch ( Exception ex )
+            {
+                Console.WriteLine( $"[GameServer.OnClientPacketReady]Exception: {ex}" );
+                throw;
+            }
         }
         /// <summary>
         /// Triggered when a runtime error occurs during read/write of a KableConnection
@@ -135,6 +139,57 @@ namespace Core.Scripts.Singletons
 
             return null;
         }
+
+        /// <summary>
+        /// Generates a new instance of a registered entity type extending GameEntity that matches the given Identifier
+        /// </summary>
+        /// <param name="entityIdentifier"></param>
+        /// <returns></returns>
+        public static GameEntity SpawnEntityByIdentifier( Identifier entityIdentifier )
+        {
+            NetId entNetId = NetId.Generate(  );
+            
+            GameObject gameObj = PrefabRegistry.GetPrefab( entityIdentifier );
+            if ( gameObj is null )
+            {
+                Debug.LogError( $"[GameServer][SpawnEntityByIdentifier]( { entityIdentifier.ToString(  ) } ); Failed to find prefab matching the entityIdentifier!" );
+                return null;
+            }
+
+            GameObject spawnedObj = GameObject.Instantiate( gameObj );
+            EntityWrapper entWrapper = spawnedObj.GetComponent<EntityWrapper>( );
+            if ( entWrapper is null )
+            {
+                Debug.LogError( $"[GameServer][SpawnEntityByIdentifier]( { entityIdentifier.ToString(  ) } ); Failed to find EntityWrapper component on spawned Object!" );
+                return null;
+            }
+
+            GameEntity gameEnt = EntityRegistry.CreateGameEntity( entityIdentifier, entWrapper, entNetId );
+
+            lock ( WorldEntities )
+            {
+                WorldEntities.Add( gameEnt.NetId, gameEnt );
+            }
+            ServerEntityEvents.InvokeOnEntitySpawn( gameEnt, Vector3.zero );
+            
+            return gameEnt;
+        }
+
+        /// <summary>
+        /// Generates a new instance of the given Entity Type
+        /// </summary>
+        /// <param name="entType"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T SpawnEntityByType<T>( ) where T : GameEntity
+        {
+            Identifier entIdent = EntityRegistry.GetIdentifierForGameEntity<T>( );
+
+            
+            GameEntity tmpEnt = SpawnEntityByIdentifier( entIdent );
+            
+            return null;
+        }
         
         /// <summary>
         /// Called whenever Unity has a game tick (every frame)
@@ -145,7 +200,16 @@ namespace Core.Scripts.Singletons
             {
                 foreach (KeyValuePair<NetId, NetPlayer> pair in NetClients)
                 {
-                    pair.Value.KableConnection.ProcessBuffer( );
+                    try
+                    {
+                        pair.Value.KableConnection.ProcessBuffer( );
+                    }
+                    catch ( Exception ex )
+                    {
+                        Debug.LogError( "Critical Error in GameServer.UnityTick:"+ex.ToString(  ) );
+                        NetClients.Clear(  );
+                        return;
+                    }
                 }
             }
         }

@@ -154,7 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabReferences:
   - prefabReference: {fileID: 4964202039200637080, guid: 92b623f60655c2747a69b38b12968072, type: 3}
-    prefabIdentifier: core:entity_player
+    prefabIdentifier: core:player_entity
 --- !u!4 &256065431
 Transform:
   m_ObjectHideFlags: 0

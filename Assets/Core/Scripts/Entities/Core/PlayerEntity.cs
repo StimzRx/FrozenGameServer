@@ -1,14 +1,23 @@
-﻿using Core.Scripts.Networking;
+﻿using Core.Scripts.Attributes;
+using Core.Scripts.Networking;
 
 using KableNet.Math;
 
+using UnityEngine;
+
 namespace Core.Scripts.Entities.Core
 {
+    [EntityType("core", "player_entity")]
     public class PlayerEntity : GameEntity
     {
-        public PlayerEntity( NetPlayer netPlayer, EntityWrapper wrapper, NetId netId ) : base( wrapper, netId )
+        public PlayerEntity( EntityWrapper wrapper, NetId netId ) : base( wrapper, netId )
         {
-            this.NetPlayer = netPlayer;
+            Debug.Log( "PlayerEntity created..." );
+        }
+
+        public void Initialize( NetId netId )
+        {
+            NetId = netId;
         }
     
         public NetPlayer NetPlayer { get; }

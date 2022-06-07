@@ -20,7 +20,18 @@ public class ServerUnityInterface : MonoBehaviour
 
     private void Update( )
     {
-        GameServer.UnityTick(  );
+        if ( disabled )
+            return;
+        
+        try
+        {
+            GameServer.UnityTick(  );
+        }
+        catch ( Exception ex )
+        {
+            disabled = true;
+            Console.WriteLine( $"Critical Error in GameServer.UnityTick()!" );
+        }
     }
 
     private void OnApplicationQuit( )
@@ -29,4 +40,6 @@ public class ServerUnityInterface : MonoBehaviour
     }
 
     [SerializeField] public PrefabReference[ ] prefabReferences;
+
+    private bool disabled = false;
 }
