@@ -7,6 +7,7 @@ using Core.Scripts.Entities.Core;
 using Core.Scripts.Events.Entity;
 using Core.Scripts.Networking.Packets;
 using Core.Scripts.Networking.Packets.Core;
+using Core.Scripts.Registries;
 using Core.Scripts.Singletons;
 
 using KableNet.Common;
@@ -38,27 +39,21 @@ namespace Core.Scripts.Networking
         // ------------ Subscribed Events ------------
         private void OnEntitySpawn( GameEntity entity, Vector3 position )
         {
-            if ( entity is PlayerEntity )
+            if ( !entity.NetId.Equals( NetId ) )
             {
-                if ( !entity.NetId.Equals( NetId ) )
-                {
-                    SendTcp( new SpawnEntityPacket( new Identifier( "core", "player_entity" ), entity.NetId ) );
-                }
+                Identifier entIdent = EntityRegistry.GetIdentifierForGameEntity( entity );
+                SendTcp( new SpawnEntityPacket( entIdent, entity.NetId ) );
+                
+                Debug.Log( $"Told client[] to spawn entity of '{ entIdent }'!" );
             }
         }
+        
         private void OnEntityDestroyed( GameEntity entity )
         {
-            // TODO: Implement THIS
-            
-            // return for now.
-            return;
-            
-            if ( entity is PlayerEntity )
+            // Make sure we arnt telling a player to destroy themselves ( lol )
+            if ( !entity.NetId.Equals( this.NetId ) )
             {
-                if ( !entity.NetId.Equals( this.NetId ) )
-                {
-                    
-                }
+                SendTcp( new DestroyEntityPacket( entity.NetId ) );
             }
         }
         
@@ -66,20 +61,12 @@ namespace Core.Scripts.Networking
 
         public void SendTcp( PacketWrapper packet )
         {
-            SendTcpAsync( packet ).Wait( );
-        }
-        public async Task SendTcpAsync( PacketWrapper packet )
-        {
-            await KableConnection.SendPacketTcpAsync( packet.GetAsPacket( ) );
+            KableConnection.SendPacketTcp( packet.GetAsPacket( ) );
         }
 
         public void SendUdp( PacketWrapper packet )
         {
-            SendUdpAsync( packet ).Wait( );
-        }
-        public async Task SendUdpAsync( PacketWrapper packet )
-        {
-            await KableConnection.SendPacketUdpAsync( packet.GetAsPacket( ) );
+            KableConnection.SendPacketUdp( packet.GetAsPacket( ) );
         }
         
         /// <summary>

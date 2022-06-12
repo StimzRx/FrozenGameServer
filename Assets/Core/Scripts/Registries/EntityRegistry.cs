@@ -45,6 +45,24 @@ namespace Core.Scripts.Registries
             return null;
         }
 
+        public static Identifier GetIdentifierForGameEntity( GameEntity gameEntity )
+        {
+            Identifier ret = new Identifier( "null", "null" );
+
+            EntityType typeAttribute = (EntityType)Attribute.GetCustomAttribute( gameEntity.GetType( ), typeof(EntityType) );
+
+            if ( typeAttribute is not null )
+            {
+                ret = new Identifier( typeAttribute.IdentifierNamespace, typeAttribute.IdentifierPath );
+            }
+            else
+            {
+                Debug.LogError( $"[EntityRegistry.GetIdentifierForGameEntity()] EntityTypeAttribute wasnt found on type: { gameEntity.GetType( ).Namespace }.{ gameEntity.GetType( ).Name }" );
+            }
+
+            return ret;
+        }
+        
         public static Identifier GetIdentifierForGameEntity<T>( ) where T : GameEntity
         {
             Identifier ret = new Identifier( "null", "null" );
