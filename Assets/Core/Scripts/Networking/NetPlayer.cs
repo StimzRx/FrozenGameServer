@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using Core.Scripts.Entities;
 using Core.Scripts.Entities.Core;
 using Core.Scripts.Events.Entity;
+using Core.Scripts.Networking.Packets;
 using Core.Scripts.Networking.Packets.Core;
+using Core.Scripts.Singletons;
 
 using KableNet.Common;
 using KableNet.Math;
@@ -25,7 +28,7 @@ namespace Core.Scripts.Networking
             KableConnection.ConnectErroredEvent += OnConnectFailure;
             KableConnection.ConnectionErroredEvent += OnKableError;
 
-            this.NetId = NetId.Generate( );
+            NetId = NetId.Generate( );
 
             // Game event registrations
             ServerEntityEvents.EntitySpawnEvent += OnEntitySpawn;
@@ -37,33 +40,48 @@ namespace Core.Scripts.Networking
         {
             if ( entity is PlayerEntity )
             {
-                if ( entity.NetId.Equals( this.NetId ) )
+                if ( !entity.NetId.Equals( NetId ) )
                 {
-                    
-                }
-                else
-                {
-                    //KableConnection.SendPacketTCPAsync( new SpawnEntityPacket( new Identifier( "core", "player_entity" ), entity.NetId ).GetAsPacket( ) ).Wait( );
+                    SendTcp( new SpawnEntityPacket( new Identifier( "core", "player_entity" ), entity.NetId ) );
                 }
             }
         }
         private void OnEntityDestroyed( GameEntity entity )
         {
+            // TODO: Implement THIS
+            
+            // return for now.
+            return;
+            
             if ( entity is PlayerEntity )
             {
-                if ( entity.NetId.Equals( this.NetId ) )
+                if ( !entity.NetId.Equals( this.NetId ) )
                 {
                     
-                }
-                else
-                {
-                    //KableConnection.SendPacketTCPAsync( new SpawnEntityPacket( new Identifier( "core", "entity_player" ), entity.NetId ).GetAsPacket( ) ).Wait( );
                 }
             }
         }
         
         // -------------------------------------------
 
+        public void SendTcp( PacketWrapper packet )
+        {
+            SendTcpAsync( packet ).Wait( );
+        }
+        public async Task SendTcpAsync( PacketWrapper packet )
+        {
+            await KableConnection.SendPacketTcpAsync( packet.GetAsPacket( ) );
+        }
+
+        public void SendUdp( PacketWrapper packet )
+        {
+            SendUdpAsync( packet ).Wait( );
+        }
+        public async Task SendUdpAsync( PacketWrapper packet )
+        {
+            await KableConnection.SendPacketUdpAsync( packet.GetAsPacket( ) );
+        }
+        
         /// <summary>
         /// Connection to client has been established
         /// </summary>
@@ -81,6 +99,8 @@ namespace Core.Scripts.Networking
         private void OnKableError( Exception ex, KableConnection source )
         {
             Debug.LogError( $"[NetPlayer.{ this.NetId }][KableError]{ ex }" );
+            Dispose( );
+            GameServer.DestroyEntity( GameServer.FindGameEntity( NetId ) );
         }
         
         /// <summary>
@@ -103,8 +123,22 @@ namespace Core.Scripts.Networking
             return this.KableConnection == conn;
         }
 
+        public void Dispose( )
+        {
+            Destroyed = true;
+            
+            KableConnection.ConnectedEvent -= OnConnected;
+            KableConnection.ConnectErroredEvent -= OnConnectFailure;
+            KableConnection.ConnectionErroredEvent -= OnKableError;
+            
+            ServerEntityEvents.EntitySpawnEvent -= OnEntitySpawn;
+            ServerEntityEvents.EntityDestroyedEvent -= OnEntityDestroyed;
+        }
+
         internal KableConnection KableConnection { get; private set; }
         
         public NetId NetId { get; protected set; }
+
+        public bool Destroyed { get; private set; } = false;
     }
 }

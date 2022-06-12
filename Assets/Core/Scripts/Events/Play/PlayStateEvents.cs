@@ -12,7 +12,7 @@ namespace Core.Scripts.Events.Play
         /// </summary>
         public delegate void OnPlayStateChanged( PlayState oldPlayState, PlayState newPlayState );
         public static event OnPlayStateChanged PlayStateChangedEvent;
-        internal static void _TriggerPlayStateChanged( PlayState oldPlayState, PlayState newPlayState )
+        internal static void TriggerPlayStateChanged( PlayState oldPlayState, PlayState newPlayState )
             => PlayStateChangedEvent?.Invoke( oldPlayState, newPlayState );
 
         

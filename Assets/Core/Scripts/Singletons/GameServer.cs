@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using Core.Scripts.Entities;
 using Core.Scripts.Entities.Core;
@@ -139,6 +140,28 @@ namespace Core.Scripts.Singletons
 
             return null;
         }
+        
+        /// <summary>
+        /// Finds a GameEntity in the world using its NetId
+        /// </summary>
+        /// <param name="searchNetId"></param>
+        /// <returns></returns>
+        public static GameEntity FindGameEntity( NetId searchNetId )
+        {
+            // This entire method needs to be optimized!!!
+            // TODO: Optimize
+            GameEntity retEnt = null;
+            
+            lock ( WorldEntities )
+            {
+                if ( WorldEntities.ContainsKey( searchNetId ) )
+                {
+                    retEnt = WorldEntities.First( x => x.Key.Equals( searchNetId ) ).Value;
+                }
+            }
+
+            return retEnt;
+        }
 
         /// <summary>
         /// Generates a new instance of a registered entity type extending GameEntity that matches the given Identifier
@@ -170,7 +193,7 @@ namespace Core.Scripts.Singletons
             {
                 WorldEntities.Add( gameEnt.NetId, gameEnt );
             }
-            ServerEntityEvents.InvokeOnEntitySpawn( gameEnt, Vector3.zero );
+            ServerEntityEvents.TriggerOnEntitySpawn( gameEnt, Vector3.zero );
             
             return gameEnt;
         }
@@ -189,6 +212,38 @@ namespace Core.Scripts.Singletons
             GameEntity tmpEnt = SpawnEntityByIdentifier( entIdent );
             
             return null;
+        }
+
+        /// <summary>
+        /// Destroys the given GameEntity in a way that is intended to be "clean"
+        /// </summary>
+        /// <param name="gameEntity"></param>
+        /// <returns>If entity was in world</returns>
+        public static bool DestroyEntity( GameEntity gameEntity )
+        {
+            if ( gameEntity is not null )
+            {
+                gameEntity.Destroy(  );
+                
+                bool foundInWorld = false;
+                lock ( WorldEntities )
+                {
+                    foundInWorld = WorldEntities.ContainsKey( gameEntity.NetId );
+                    if ( foundInWorld )
+                    {
+                        WorldEntities.Remove( gameEntity.NetId );
+                    }
+                }
+
+                if ( foundInWorld )
+                {
+                    ServerEntityEvents.TriggerOnEntityDestroyed( gameEntity );
+                    
+                    return true;
+                }
+            }
+
+            return false;
         }
         
         /// <summary>

@@ -17,12 +17,17 @@ namespace Core.Scripts.Entities
 
         internal virtual void ServerSpawned( )
         {
-            ServerEntityEvents.InvokeOnEntitySpawn( this, WrapperObject.transform.position );
+            ServerEntityEvents.TriggerOnEntitySpawn( this, WrapperObject.transform.position );
         }
 
         internal virtual void ServerTick( float deltaTime )
         {
 
+        }
+
+        public virtual void Destroy( )
+        {
+            
         }
 
         public NetId NetId { get; protected set; }
