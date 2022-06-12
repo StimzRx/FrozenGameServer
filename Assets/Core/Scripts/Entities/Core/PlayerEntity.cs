@@ -14,11 +14,6 @@ namespace Core.Scripts.Entities.Core
         {
             Debug.Log( "PlayerEntity created..." );
         }
-
-        public void Initialize( NetId netId )
-        {
-            NetId = netId;
-        }
     
         public NetPlayer NetPlayer { get; }
     }

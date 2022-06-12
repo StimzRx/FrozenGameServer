@@ -149,7 +149,6 @@ namespace Core.Scripts.Singletons
         public static GameEntity FindGameEntity( NetId searchNetId )
         {
             // This entire method needs to be optimized!!!
-            // TODO: Optimize
             GameEntity retEnt = null;
             
             lock ( WorldEntities )
@@ -175,7 +174,7 @@ namespace Core.Scripts.Singletons
             GameObject gameObj = PrefabRegistry.GetPrefab( entityIdentifier );
             if ( gameObj is null )
             {
-                Debug.LogError( $"[GameServer][SpawnEntityByIdentifier]( { entityIdentifier.ToString(  ) } ); Failed to find prefab matching the entityIdentifier!" );
+                Debug.LogError( $"[GameServer][SpawnEntityByIdentifier]( { entityIdentifier } ); Failed to find prefab matching the entityIdentifier!" );
                 return null;
             }
 
@@ -183,7 +182,7 @@ namespace Core.Scripts.Singletons
             EntityWrapper entWrapper = spawnedObj.GetComponent<EntityWrapper>( );
             if ( entWrapper is null )
             {
-                Debug.LogError( $"[GameServer][SpawnEntityByIdentifier]( { entityIdentifier.ToString(  ) } ); Failed to find EntityWrapper component on spawned Object!" );
+                Debug.LogError( $"[GameServer][SpawnEntityByIdentifier]( { entityIdentifier } ); Failed to find EntityWrapper component on spawned Object!" );
                 return null;
             }
 

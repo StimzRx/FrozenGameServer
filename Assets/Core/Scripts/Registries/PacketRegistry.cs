@@ -89,7 +89,11 @@ namespace Core.Scripts.Registries
         /// </summary>
         private static List< PacketHandlerRegistryEntry > _handlerRegister = new List <PacketHandlerRegistryEntry >( )
         {
+            // Game State Updates
             { PacketHandlerRegistryEntry.Create( typeof(AuthMeHandler) ) },
+            
+            // Entity Updates
+            { PacketHandlerRegistryEntry.Create( typeof(NotifyMoveHandler) ) },
         };
 
         /// <summary>
@@ -97,7 +101,15 @@ namespace Core.Scripts.Registries
         /// </summary>
         private static List<PacketRegistryEntry> _packetRegister = new List<PacketRegistryEntry>()
         {
+            // Game State Updates
             { PacketRegistryEntry.Create( typeof(ReadyPacket) ) },
+            
+            // Entity Creation/Destruction
+            { PacketRegistryEntry.Create( typeof(SpawnEntityPacket) ) },
+            { PacketRegistryEntry.Create( typeof(DestroyEntityPacket) ) },
+            
+            // Entity Updates
+            { PacketRegistryEntry.Create( typeof(MoveEntityPacket) ) },
         };
 
         readonly private static Dictionary<Type, TriggerCacheEntry> TriggerCache = new Dictionary<Type, TriggerCacheEntry>( );
