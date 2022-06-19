@@ -8,6 +8,8 @@ namespace Core.Scripts.Entities
 {
     public class GameEntity
     {
+        private const float NetworkLerpSeconds = 0.5f;
+        
         public GameEntity( EntityWrapper wrapper, NetId netId )
         {
             NetId = netId;
@@ -23,7 +25,18 @@ namespace Core.Scripts.Entities
 
         internal virtual void ServerTick( float deltaTime )
         {
-
+            if ( PositionLerpAmt < 1f )
+            {
+                WrapperTransform.position = Vector3.Lerp( PreviousPosition, TargetPosition, PositionLerpAmt );
+                PositionLerpAmt += deltaTime / NetworkLerpSeconds;
+            }
+            if ( RotationLerpAmt < 1f )
+            {
+                Quaternion prevRot = Quaternion.Euler( PreviousRotation );
+                Quaternion tarRot = Quaternion.Euler( TargetRotation );
+                WrapperTransform.rotation = Quaternion.Lerp( prevRot, tarRot, RotationLerpAmt );
+                RotationLerpAmt += deltaTime / NetworkLerpSeconds;
+            }
         }
 
         public virtual void Destroy( )
@@ -31,6 +44,7 @@ namespace Core.Scripts.Entities
             
         }
 
+        
         /// <summary>
         /// Instantly teleports entity to the given location. For sliding, see #Move
         /// </summary>
@@ -38,7 +52,13 @@ namespace Core.Scripts.Entities
         /// <param name="newRot"></param>
         public virtual void Teleport( Vector3 newPos, Vector3 newRot )
         {
-            
+            TargetPosition = newPos;
+            TargetRotation = newRot;
+            PreviousPosition = TargetPosition;
+            PreviousRotation = TargetRotation;
+
+            WrapperTransform.position = TargetPosition;
+            WrapperTransform.eulerAngles = TargetRotation;
         }
         
         /// <summary>
@@ -56,6 +76,9 @@ namespace Core.Scripts.Entities
 
             WrapperTransform.position = TargetPosition;
             WrapperTransform.eulerAngles = TargetRotation;
+
+            PositionLerpAmt = 0f;
+            RotationLerpAmt = 0f;
         }
 
         public NetId NetId { get; private set; }
@@ -67,5 +90,7 @@ namespace Core.Scripts.Entities
         public Vector3 TargetPosition { get; protected set; } = Vector3.zero;
         public Vector3 PreviousRotation { get; protected set; } = Vector3.zero;
         public Vector3 TargetRotation { get; protected set; } = Vector3.zero;
+        public float PositionLerpAmt { get; protected set; } = 1f;
+        public float RotationLerpAmt { get; protected set; } = 1f;
     }
 }

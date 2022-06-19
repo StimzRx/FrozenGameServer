@@ -38,7 +38,7 @@ namespace Core.Scripts.Registries
                 if ( reference.EntryIdentifier == identifier )
                 {
                     GameEntity gameEnt = (GameEntity)Activator.CreateInstance( reference.EntryType, wrapper, entNetId );
-                    
+                    wrapper.Initialize( gameEnt );
                     return gameEnt;
                 }
             }

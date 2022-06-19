@@ -14,7 +14,17 @@ namespace Core.Scripts.Entities.Core
         {
             Debug.Log( "PlayerEntity created..." );
         }
-    
+
+        override internal void ServerSpawned( )
+        {
+            base.ServerSpawned( );
+        }
+
+        override internal void ServerTick( float deltaTime )
+        {
+            base.ServerTick( deltaTime );
+        }
+
         public NetPlayer NetPlayer { get; }
     }
 }
