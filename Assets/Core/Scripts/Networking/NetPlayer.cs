@@ -39,13 +39,14 @@ namespace Core.Scripts.Networking
         // ------------ Subscribed Events ------------
         private void OnEntitySpawn( GameEntity entity, Vector3 position )
         {
-            if ( !entity.NetId.Equals( NetId ) )
-            {
-                Identifier entIdent = EntityRegistry.GetIdentifierForGameEntity( entity );
-                SendTcp( new SpawnEntityPacket( entIdent, entity.NetId ) );
+            // If its the clients NetId then send a modified packet
+            // that says to spawn the LocalPlayer prefab. Otherwise
+            // just grab the ident from the object and pass it to the packet.
+            Identifier entIdent = !entity.NetId.Equals( NetId ) ? EntityRegistry.GetIdentifierForGameEntity( entity ) : new Identifier( "core", "local_player_entity" );
+            
+            SendTcp( new SpawnEntityPacket( entIdent, entity.NetId ) );
                 
-                Debug.Log( $"Told client[] to spawn entity of '{ entIdent }'!" );
-            }
+            Debug.Log( $"Told client[{ NetId }] to spawn entity of '{ entIdent }'!" );
         }
         
         private void OnEntityDestroyed( GameEntity entity )

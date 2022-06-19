@@ -9,13 +9,16 @@ namespace Core.Scripts.Networking.Packets.Core
     [NetPacket("core", "ready_packet")]
     public class ReadyPacket : PacketWrapper
     {
+        public ReadyPacket( NetId clientsNetId )
+        {
+            _clientsNetId = clientsNetId;
+        }
+        private NetId _clientsNetId;
 
         protected override void ToPacket( KablePacket p )
         {
-            // Not sending any data besides this packet's
-            // Identifier, which is handled in the background
+            p.Write( _clientsNetId );
         }
 
-        //public override Identifier identifier { get { return new Identifier( "core", "ready" ); } }
     }
 }
