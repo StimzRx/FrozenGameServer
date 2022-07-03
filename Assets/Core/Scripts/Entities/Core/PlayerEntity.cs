@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Core.Scripts.Entities.Core
 {
-    [EntityType("core", "player_entity")]
+    [EntityType("core.entity", "player")]
     public class PlayerEntity : GameEntity
     {
         public PlayerEntity( EntityWrapper wrapper, NetId netId ) : base( wrapper, netId )

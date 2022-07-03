@@ -5,7 +5,7 @@ using KableNet.Math;
 
 namespace Core.Scripts.Networking.Packets.Core
 {
-    [NetPacket("core","destroy_entity_packet")]
+    [NetPacket( "core.packet", "destroy_entity")]
     public class DestroyEntityPacket : PacketWrapper
     {
         public DestroyEntityPacket( NetId netId )

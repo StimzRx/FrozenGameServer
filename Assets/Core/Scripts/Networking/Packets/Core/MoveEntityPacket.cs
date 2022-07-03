@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Core.Scripts.Networking.Packets.Core
 {
-    [NetPacket("core", "move_entity_packet")]
+    [NetPacket( "core.packet", "move_entity")]
     public class MoveEntityPacket : PacketWrapper
     {
         public MoveEntityPacket( NetId netId, Vector3 newPos, Vector3 newRot )

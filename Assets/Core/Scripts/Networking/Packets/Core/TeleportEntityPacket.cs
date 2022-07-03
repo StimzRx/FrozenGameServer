@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Core.Scripts.Networking.Packets.Core
 {
-    [NetPacket("core", "teleport_entity_packet")]
+    [NetPacket("core.packet", "teleport_entity")]
     public class TeleportEntityPacket : PacketWrapper
     {
         public TeleportEntityPacket( NetId netId, Vector3 newPos, Vector3 newRot )

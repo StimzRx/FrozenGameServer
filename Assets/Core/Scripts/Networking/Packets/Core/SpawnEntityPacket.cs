@@ -7,7 +7,7 @@ using UnityEditor.Build.Content;
 
 namespace Core.Scripts.Networking.Packets.Core
 {
-    [NetPacket("core", "spawn_entity_packet")]
+    [NetPacket("core.packet", "spawn_entity")]
     public class SpawnEntityPacket : PacketWrapper
     {
         public SpawnEntityPacket( Identifier entityIdent, NetId netId )

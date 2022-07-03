@@ -6,7 +6,7 @@ using KableNet.Math;
 namespace Core.Scripts.Networking.Packets.Core
 {
 
-    [NetPacket("core", "ready_packet")]
+    [NetPacket( "core.packet", "ready")]
     public class ReadyPacket : PacketWrapper
     {
         public ReadyPacket( NetId clientsNetId )
