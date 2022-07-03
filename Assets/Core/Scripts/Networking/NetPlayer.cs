@@ -45,8 +45,6 @@ namespace Core.Scripts.Networking
             Identifier entIdent = !entity.NetId.Equals( NetId ) ? EntityRegistry.GetIdentifierForGameEntity( entity ) : new Identifier( "core", "local_player_entity" );
             
             SendTcp( new SpawnEntityPacket( entIdent, entity.NetId ) );
-                
-            Debug.Log( $"Told client[{ NetId }] to spawn entity of '{ entIdent }'!" );
         }
         
         private void OnEntityDestroyed( GameEntity entity )
@@ -62,12 +60,12 @@ namespace Core.Scripts.Networking
 
         public void SendTcp( PacketWrapper packet )
         {
-            KableConnection.SendPacketTcp( packet.GetAsPacket( ) );
+            KableConnection.SendPacketTcp( packet.GetAsPacket(  ) );
         }
 
         public void SendUdp( PacketWrapper packet )
         {
-            KableConnection.SendPacketUdp( packet.GetAsPacket( ) );
+            KableConnection.SendPacketTcp( packet.GetAsPacket( ) );
         }
         
         /// <summary>
@@ -76,7 +74,7 @@ namespace Core.Scripts.Networking
         /// <param name="source"></param>
         private void OnConnected( KableConnection source )
         {
-            Debug.LogError( $"[NetPlayer.{ this.NetId }] Connected!" );
+           //Debug.LogError( $"[NetPlayer.{ this.NetId }] Connected!" );
         }
         
         /// <summary>
@@ -86,9 +84,28 @@ namespace Core.Scripts.Networking
         /// <param name="source"></param>
         private void OnKableError( Exception ex, KableConnection source )
         {
-            Debug.LogError( $"[NetPlayer.{ this.NetId }][KableError]{ ex }" );
-            Dispose( );
-            GameServer.DestroyEntity( GameServer.FindGameEntity( NetId ) );
+            try
+            {
+                Debug.LogError( $"[NetPlayer.{this.NetId}][KableError]{ex}" );
+                Dispose( );
+                Action ac = new Action( ( ) =>
+                {
+                    if ( !GameServer.DestroyEntity( GameServer.FindGameEntity( NetId ) ) )
+                    {
+                        Debug.LogError( $"Failed to destroy entity in NetPlayer.OnKableError()!" );
+                    }
+                    else
+                    {
+                        Debug.Log( $"Destroyed NetPlayer..." );
+                    }
+                } );
+
+                ThreadHelper.Queue( ac );
+            }
+            catch(Exception exc)
+            {
+                Debug.LogError( $"OnKableError Exception!\n{exc.ToString()}" );
+            }
         }
         
         /// <summary>

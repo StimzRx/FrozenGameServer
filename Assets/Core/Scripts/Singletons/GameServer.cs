@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 
 using Core.Scripts.Entities;
 using Core.Scripts.Entities.Core;
@@ -53,7 +54,7 @@ namespace Core.Scripts.Singletons
 
             Debug.Log( "Started server!" );
         }
-        
+
         /// <summary>
         /// Triggered when a new client connects to this server
         /// </summary>
@@ -61,12 +62,12 @@ namespace Core.Scripts.Singletons
         private static void OnKableConnection( KableConnection connection )
         {
             connection.PacketReadyEvent += OnClientPacketReady;
-            Debug.Log( $"[GameServer][OnKableConnection] New Connection..." );
             NetPlayer netPlr = new NetPlayer( connection );
             lock ( NetClients )
             {
                 NetClients.Add( netPlr.NetId, netPlr );
             }
+            Debug.Log( $"[GameServer][OnKableConnection] New Connection..." );
         }
         
         /// <summary>
@@ -76,7 +77,7 @@ namespace Core.Scripts.Singletons
         /// <param name="source">Source KableConnection</param>
         private static void OnClientPacketReady( KablePacket packet, KableConnection source )
         {
-            Debug.LogError( $"[GameServer] Packet ready with '{ packet.Count }' bytes." );
+            //Debug.LogError( $"[GameServer] Packet ready with '{ packet.Count }' bytes." );
 
             Identifier packetIdent = packet.ReadIdentifier( );
 
@@ -87,7 +88,6 @@ namespace Core.Scripts.Singletons
             catch ( Exception ex )
             {
                 Console.WriteLine( $"[GameServer.OnClientPacketReady]Exception: {ex}" );
-                throw;
             }
         }
         /// <summary>
@@ -167,9 +167,12 @@ namespace Core.Scripts.Singletons
         /// </summary>
         /// <param name="entityIdentifier"></param>
         /// <returns></returns>
-        public static GameEntity SpawnEntityByIdentifier( Identifier entityIdentifier )
+        public static GameEntity SpawnEntityByIdentifier( Identifier entityIdentifier, NetId netId = null )
         {
-            NetId entNetId = NetId.Generate(  );
+            if ( netId is null )
+            {
+                netId = NetId.Generate(  );
+            }
             
             GameObject gameObj = PrefabRegistry.GetPrefab( entityIdentifier );
             if ( gameObj is null )
@@ -186,13 +189,20 @@ namespace Core.Scripts.Singletons
                 return null;
             }
 
-            GameEntity gameEnt = EntityRegistry.CreateGameEntity( entityIdentifier, entWrapper, entNetId );
+            GameEntity gameEnt = EntityRegistry.CreateGameEntity( entityIdentifier, entWrapper, netId );
 
             lock ( WorldEntities )
             {
                 WorldEntities.Add( gameEnt.NetId, gameEnt );
             }
-            ServerEntityEvents.TriggerOnEntitySpawn( gameEnt, Vector3.zero );
+            try
+            {
+                ServerEntityEvents.TriggerOnEntitySpawn( gameEnt, Vector3.zero );
+            }
+            catch ( Exception ex )
+            {
+                Debug.LogError( $"[GameServer.SpawnEntityByIdentifier().TriggerOnEntitySpawn()]Crash:\n{ex}" );
+            }
             
             return gameEnt;
         }
@@ -203,12 +213,12 @@ namespace Core.Scripts.Singletons
         /// <param name="entType"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T SpawnEntityByType<T>( ) where T : GameEntity
+        public static T SpawnEntityByType<T>( NetId netId = null ) where T : GameEntity
         {
             Identifier entIdent = EntityRegistry.GetIdentifierForGameEntity<T>( );
 
             
-            GameEntity tmpEnt = SpawnEntityByIdentifier( entIdent );
+            GameEntity tmpEnt = SpawnEntityByIdentifier( entIdent, netId );
             
             return null;
         }
@@ -237,7 +247,9 @@ namespace Core.Scripts.Singletons
                 if ( foundInWorld )
                 {
                     ServerEntityEvents.TriggerOnEntityDestroyed( gameEntity );
-                    
+
+                    UnityEngine.Object.Destroy( gameEntity.WrapperTransform.root.gameObject );
+
                     return true;
                 }
             }
@@ -261,11 +273,13 @@ namespace Core.Scripts.Singletons
                     catch ( Exception ex )
                     {
                         Debug.LogError( "Critical Error in GameServer.UnityTick:"+ex.ToString(  ) );
-                        NetClients.Clear(  );
+                        //NetClients.Clear(  );
                         return;
                     }
                 }
             }
+
+            ThreadHelper.Process( );
         }
         
         /// <summary>

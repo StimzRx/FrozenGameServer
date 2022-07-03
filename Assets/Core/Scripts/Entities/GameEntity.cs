@@ -20,7 +20,7 @@ namespace Core.Scripts.Entities
 
         internal virtual void ServerSpawned( )
         {
-            ServerEntityEvents.TriggerOnEntitySpawn( this, WrapperObject.transform.position );
+            
         }
 
         internal virtual void ServerTick( float deltaTime )
@@ -92,5 +92,17 @@ namespace Core.Scripts.Entities
         public Vector3 TargetRotation { get; protected set; } = Vector3.zero;
         public float PositionLerpAmt { get; protected set; } = 1f;
         public float RotationLerpAmt { get; protected set; } = 1f;
+
+        // ------------ STATS ------------ \\
+        public float BaseMovementSpeed { get; protected set; }
+        public float BonusMovementSpeed { get; protected set; }
+        public float SprintSpeedMultiplier { get; protected set; }
+
+        public float Health { get; protected set; }
+        public float MaxHealth { get; protected set; }
+
+        public float Stamina { get; protected set; }
+        public float MaxStamina { get; protected set; }
+
     }
 }

@@ -93,7 +93,7 @@ namespace Core.Scripts.Registries
             { PacketHandlerRegistryEntry.Create( typeof(AuthMeHandler) ) },
             
             // Entity Updates
-            { PacketHandlerRegistryEntry.Create( typeof(NotifyMoveHandler) ) },
+            { PacketHandlerRegistryEntry.Create( typeof(RequestMoveHandler) ) },
         };
 
         /// <summary>
@@ -110,6 +110,7 @@ namespace Core.Scripts.Registries
             
             // Entity Updates
             { PacketRegistryEntry.Create( typeof(MoveEntityPacket) ) },
+            { PacketRegistryEntry.Create( typeof(TeleportEntityPacket) )},
         };
 
         readonly private static Dictionary<Type, TriggerCacheEntry> TriggerCache = new Dictionary<Type, TriggerCacheEntry>( );

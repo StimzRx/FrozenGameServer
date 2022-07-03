@@ -1,6 +1,7 @@
 ﻿using Core.Scripts.Attributes;
 using Core.Scripts.Entities.Core;
 using Core.Scripts.Networking.Packets;
+using Core.Scripts.Networking.Packets.Core;
 using Core.Scripts.Singletons;
 
 using KableNet.Common;
@@ -37,10 +38,12 @@ namespace Core.Scripts.Networking.Handlers.Core
                 Debug.LogError( "NetPLR Is null?!?" );
                 return;
             }
+
+            netPlr.SendTcp( new ReadyPacket( netPlr.NetId ) );
             
             Debug.Log( $"User '{ usernameRaw }'[{ netPlr.NetId }] has joined..." );
 
-            PlayerEntity plrEnt = GameServer.SpawnEntityByType<PlayerEntity>( );
+            PlayerEntity plrEnt = GameServer.SpawnEntityByType<PlayerEntity>( netPlr.NetId );
         }
     }
 }
