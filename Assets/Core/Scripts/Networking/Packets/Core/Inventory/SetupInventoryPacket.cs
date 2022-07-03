@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Core.Scripts.Networking.Packets.Core.Inventory
 {
-    [NetPacket( "core", "setup_inventory_packet" )]
+    [NetPacket( "core.packet", "setup_inventory" )]
     public class SetupInventoryPacket : PacketWrapper
     {
 
