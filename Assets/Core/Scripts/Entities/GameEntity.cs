@@ -1,4 +1,5 @@
-﻿using Core.Scripts.Events.Entity;
+﻿using Assets.Core.Scripts.Inventories;
+using Core.Scripts.Events.Entity;
 
 using KableNet.Math;
 
@@ -20,7 +21,7 @@ namespace Core.Scripts.Entities
 
         internal virtual void ServerSpawned( )
         {
-            
+            Inventory = new Inventory( 4, 10 );
         }
 
         internal virtual void ServerTick( float deltaTime )
@@ -85,7 +86,9 @@ namespace Core.Scripts.Entities
         public EntityWrapper WrapperComponent { get; private set; }
         public GameObject WrapperObject { get; private set; }
         public Transform WrapperTransform { get; private set; }
+        public Inventory Inventory { get; protected set; }
 
+        // ------------ POS/ROT LERPING ------------ \\
         public Vector3 PreviousPosition { get; protected set; } = Vector3.zero;
         public Vector3 TargetPosition { get; protected set; } = Vector3.zero;
         public Vector3 PreviousRotation { get; protected set; } = Vector3.zero;
