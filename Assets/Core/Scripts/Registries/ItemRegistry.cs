@@ -14,6 +14,12 @@ namespace Assets.Core.Scripts.Registries
     public static class ItemRegistry
     {
 
+        private static List<ItemRegistryEntry> _register = new List<ItemRegistryEntry>( )
+        {
+            //{ ItemRegistryEntry.Create( typeof(null) ) },
+        };
+
+
         public static Item CreateItem( Identifier identifier )
         {
             ItemRegistryEntry[ ] refBuffer;
@@ -68,10 +74,5 @@ namespace Assets.Core.Scripts.Registries
 
             return ret;
         }
-
-        private static List<ItemRegistryEntry> _register = new List<ItemRegistryEntry>( )
-        {
-            //{ ItemRegistryEntry.Create( typeof(null) ) },
-        };
     }
 }

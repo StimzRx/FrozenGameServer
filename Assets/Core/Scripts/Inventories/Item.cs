@@ -8,17 +8,11 @@ using System.Threading.Tasks;
 
 namespace Assets.Core.Scripts.Inventories
 {
-    [ItemType("", 0, "core.items", "empty")]
+    [ItemType("core.items", "empty")]
     public class Item
     {
-
-        public static Item EMPTY
-        {
-            get
-            {
-                return new Item( );
-            }
-        }
+        public string Name { get; private set; }
+        public int MaxStackSize { get; private set; }
         
     }
 }

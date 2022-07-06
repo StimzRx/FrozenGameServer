@@ -13,15 +13,10 @@ namespace Assets.Core.Scripts.Attributes
     ]
     internal class ItemType : System.Attribute
     {
-        public ItemType( string name, int maxStackSize, string identPath, string identValue )
+        public ItemType( string identPath, string identValue )
         {
-            Name = name;
-            MaxStackSize = maxStackSize;
             Identifier = new Identifier(identPath, identValue);
         }
-
-        public string Name { get; private set; }
-        public int MaxStackSize { get; private set; }
         public Identifier Identifier { get; private set; }
 
     }
