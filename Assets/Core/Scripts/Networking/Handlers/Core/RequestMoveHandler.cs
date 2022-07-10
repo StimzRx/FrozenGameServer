@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Core.Scripts.Networking.Handlers.Core
 {
-    [NetHandler("core", "request_move_packet")]
+    [NetHandler( "core.packet", "request_move")]
     public class RequestMoveHandler : PacketHandler
     {
         public override void HandlePacket( KablePacket packet, KableConnection conn )

@@ -38,7 +38,7 @@ namespace Assets.Core.Scripts.Serialization
                 return;
             }
 
-            rawBuffer.AddRange(data.ToSerial( ).ToList( ));
+            rawBuffer.AddRange(data.ToSerial( ).GetRaw( ).ToList( ));
         }
 
         public void Write( ItemStack data )
@@ -48,7 +48,7 @@ namespace Assets.Core.Scripts.Serialization
                 return;
             }
 
-            rawBuffer.AddRange(data.ToSerial( ).ToList( ));
+            rawBuffer.AddRange(data.ToSerial( ).GetRaw( ).ToList( ));
         }
 
         public void Write( SerialData data )

@@ -14,7 +14,7 @@ namespace Core.Scripts.Networking.Handlers.Core
     /// <summary>
     /// "Authentication" packet's handler
     /// </summary>
-    [NetHandler("core", "auth_me_packet")]
+    [NetHandler( "core.packet", "auth_me")]
     public class AuthMeHandler : PacketHandler
     {
         public override void HandlePacket( KablePacket p, KableConnection src )
@@ -40,10 +40,10 @@ namespace Core.Scripts.Networking.Handlers.Core
             }
 
             netPlr.SendTcp( new ReadyPacket( netPlr.NetId ) );
-            
-            Debug.Log( $"User '{ usernameRaw }'[{ netPlr.NetId }] has joined..." );
 
             PlayerEntity plrEnt = GameServer.SpawnEntityByType<PlayerEntity>( netPlr.NetId );
+
+            Debug.Log( $"User '{usernameRaw}'[{netPlr.NetId}] has joined..." );
         }
     }
 }

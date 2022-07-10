@@ -42,7 +42,7 @@ namespace Core.Scripts.Networking
             // If its the clients NetId then send a modified packet
             // that says to spawn the LocalPlayer prefab. Otherwise
             // just grab the ident from the object and pass it to the packet.
-            Identifier entIdent = !entity.NetId.Equals( NetId ) ? EntityRegistry.GetIdentifierForGameEntity( entity ) : new Identifier( "core", "local_player_entity" );
+            Identifier entIdent = !entity.NetId.Equals( NetId ) ? EntityRegistry.GetIdentifierForGameEntity( entity ) : new Identifier( "core.entity", "local_player" );
             
             SendTcp( new SpawnEntityPacket( entIdent, entity.NetId ) );
         }
@@ -62,11 +62,6 @@ namespace Core.Scripts.Networking
         {
             KableConnection.SendPacketTcp( packet.GetAsPacket(  ) );
         }
-
-        public void SendUdp( PacketWrapper packet )
-        {
-            KableConnection.SendPacketTcp( packet.GetAsPacket( ) );
-        }
         
         /// <summary>
         /// Connection to client has been established
@@ -74,7 +69,7 @@ namespace Core.Scripts.Networking
         /// <param name="source"></param>
         private void OnConnected( KableConnection source )
         {
-           //Debug.LogError( $"[NetPlayer.{ this.NetId }] Connected!" );
+           Debug.Log( $"[NetPlayer.{ this.NetId }] Connected!" );
         }
         
         /// <summary>

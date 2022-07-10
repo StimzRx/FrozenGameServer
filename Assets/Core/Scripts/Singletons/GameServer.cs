@@ -87,7 +87,7 @@ namespace Core.Scripts.Singletons
             }
             catch ( Exception ex )
             {
-                Console.WriteLine( $"[GameServer.OnClientPacketReady]Exception: {ex}" );
+                Debug.Log( $"[GameServer.OnClientPacketReady]Exception: {ex}" );
             }
         }
         /// <summary>
@@ -195,15 +195,9 @@ namespace Core.Scripts.Singletons
             {
                 WorldEntities.Add( gameEnt.NetId, gameEnt );
             }
-            try
-            {
-                ServerEntityEvents.TriggerOnEntitySpawn( gameEnt, Vector3.zero );
-            }
-            catch ( Exception ex )
-            {
-                Debug.LogError( $"[GameServer.SpawnEntityByIdentifier().TriggerOnEntitySpawn()]Crash:\n{ex}" );
-            }
-            
+
+            ServerEntityEvents.TriggerOnEntitySpawn( gameEnt, Vector3.zero );
+
             return gameEnt;
         }
 
@@ -217,10 +211,9 @@ namespace Core.Scripts.Singletons
         {
             Identifier entIdent = EntityRegistry.GetIdentifierForGameEntity<T>( );
 
-            
             GameEntity tmpEnt = SpawnEntityByIdentifier( entIdent, netId );
             
-            return null;
+            return ( T )tmpEnt;
         }
 
         /// <summary>

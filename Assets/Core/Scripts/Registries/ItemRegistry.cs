@@ -57,7 +57,7 @@ namespace Assets.Core.Scripts.Registries
             return ret;
         }
 
-        public static Identifier GetIdentifierForGameEntity<T>( ) where T : Item
+        public static Identifier GetIdentifierForItem<T>( ) where T : Item
         {
             Identifier ret = new Identifier( "null", "null" );
 

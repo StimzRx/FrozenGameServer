@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-
+using Assets.Core.Scripts.Networking.Packets.Core.Inventory;
 using Core.Scripts.Attributes;
 using Core.Scripts.Networking.Handlers;
 using Core.Scripts.Networking.Handlers.Core;
@@ -23,6 +23,42 @@ namespace Core.Scripts.Registries
     /// </summary>
     public static class PacketRegistry
     {
+
+        /// <summary>
+        /// The list/registry of NetworkHandlers'
+        /// </summary>
+        private static List<PacketHandlerRegistryEntry> _handlerRegister = new List<PacketHandlerRegistryEntry>( )
+        {
+            // Game State Updates
+            { PacketHandlerRegistryEntry.Create( typeof(AuthMeHandler) ) },
+            
+            // Entity Updates
+            { PacketHandlerRegistryEntry.Create( typeof(RequestMoveHandler) ) },
+        };
+
+        /// <summary>
+        /// The list/registry of NetworkPackets'
+        /// </summary>
+        private static List<PacketRegistryEntry> _packetRegister = new List<PacketRegistryEntry>( )
+        {
+            // Game State Updates
+            { PacketRegistryEntry.Create( typeof(ReadyPacket) ) },
+            
+            // Entity Creation/Destruction
+            { PacketRegistryEntry.Create( typeof(SpawnEntityPacket) ) },
+            { PacketRegistryEntry.Create( typeof(DestroyEntityPacket) ) },
+            
+            // Entity Updates
+            { PacketRegistryEntry.Create( typeof(MoveEntityPacket) ) },
+            { PacketRegistryEntry.Create( typeof(TeleportEntityPacket) )},
+
+            // Inventory
+            { PacketRegistryEntry.Create( typeof( SetupInventoryPacket ) ) },
+        };
+
+
+
+
         /// <summary>
         /// Triggers a NetworkHandler
         /// </summary>
@@ -83,35 +119,6 @@ namespace Core.Scripts.Registries
             }
             return ident;
         }
-        
-        /// <summary>
-        /// The list/registry of NetworkHandlers'
-        /// </summary>
-        private static List< PacketHandlerRegistryEntry > _handlerRegister = new List <PacketHandlerRegistryEntry >( )
-        {
-            // Game State Updates
-            { PacketHandlerRegistryEntry.Create( typeof(AuthMeHandler) ) },
-            
-            // Entity Updates
-            { PacketHandlerRegistryEntry.Create( typeof(RequestMoveHandler) ) },
-        };
-
-        /// <summary>
-        /// The list/registry of NetworkPackets'
-        /// </summary>
-        private static List<PacketRegistryEntry> _packetRegister = new List<PacketRegistryEntry>()
-        {
-            // Game State Updates
-            { PacketRegistryEntry.Create( typeof(ReadyPacket) ) },
-            
-            // Entity Creation/Destruction
-            { PacketRegistryEntry.Create( typeof(SpawnEntityPacket) ) },
-            { PacketRegistryEntry.Create( typeof(DestroyEntityPacket) ) },
-            
-            // Entity Updates
-            { PacketRegistryEntry.Create( typeof(MoveEntityPacket) ) },
-            { PacketRegistryEntry.Create( typeof(TeleportEntityPacket) )},
-        };
 
         readonly private static Dictionary<Type, TriggerCacheEntry> TriggerCache = new Dictionary<Type, TriggerCacheEntry>( );
 
