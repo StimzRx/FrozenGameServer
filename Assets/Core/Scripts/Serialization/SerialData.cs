@@ -31,6 +31,14 @@ namespace Assets.Core.Scripts.Serialization
             return (byte[])rawBuffer.ToArray( ).Clone();
         }
 
+        public int Count
+        {
+            get
+            {
+                return rawBuffer.Count;
+            }
+        }
+
         public void Write( Item data )
         {
             if ( data is null )
@@ -118,6 +126,12 @@ namespace Assets.Core.Scripts.Serialization
             Write( data.value );
         }
 
+        public byte[ ] ReadByte( int count = 1 )
+        {
+            byte[ ] buff = rawBuffer.GetRange( readPosition, count ).ToArray();
+            readPosition += count;
+            return buff;
+        }
         public int ReadInt( )
         {
             byte[ ] buff = rawBuffer.GetRange( readPosition, BYTES_NORMAL ).ToArray();
