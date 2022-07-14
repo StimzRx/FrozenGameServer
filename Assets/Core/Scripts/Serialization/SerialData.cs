@@ -53,7 +53,7 @@ namespace Assets.Core.Scripts.Serialization
 
         public void Write( SerialData data )
         {
-
+            Write( data.GetRaw( ) );
         }
 
         public void Write( byte[ ] data)
@@ -96,15 +96,10 @@ namespace Assets.Core.Scripts.Serialization
         }
         public void Write( string data )
         {
-            if( data is null )
-            {
-                return;
-            }
-
             List<byte> byteBuffer = new List<byte>( );
-            byteBuffer.AddRange( BitConverter.GetBytes( data.Length ) );
-            byteBuffer.AddRange( Encoding.Unicode.GetBytes( data ) );
-            rawBuffer.AddRange( byteBuffer );
+            byte[ ] encodedString = Encoding.Unicode.GetBytes( data );
+            Write( encodedString.Length );
+            Write( encodedString );
         }
         public void Write( Vec2i data )
         {
@@ -156,13 +151,11 @@ namespace Assets.Core.Scripts.Serialization
 
             return BitConverter.ToInt32( buff, 0 );
         }
-
         public string ReadString( )
         {
-            byte[ ] buff = rawBuffer.GetRange( readPosition, BYTES_NORMAL ).ToArray( );
-            int sizeMarker = BitConverter.ToInt32( buff, 0 );
-            readPosition += BYTES_NORMAL;
-            buff = rawBuffer.GetRange( readPosition, sizeMarker ).ToArray( );
+            int sizeMarker = ReadInt( );
+
+            byte[ ] buff = rawBuffer.GetRange( readPosition, sizeMarker ).ToArray( );
             readPosition += sizeMarker;
             return Encoding.Unicode.GetString( buff );
         }

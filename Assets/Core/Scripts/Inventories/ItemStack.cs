@@ -12,11 +12,11 @@ namespace Assets.Core.Scripts.Inventories
 {
     public class ItemStack : Serializable<ItemStack>
     {
-        public Item Item { get; protected set; }
-        public int Count { get; protected set; } = 1;
-        public int StackWeight { get; protected set; }
-        public string StackName { get; protected set; }
-        public string StackDescription { get; protected set; }
+        public Item Item { get; set; }
+        public int Count { get; set; } = 1;
+        public float StackWeight { get; set; }
+        public string StackName { get; set; }
+        public string StackDescription { get; set; }
 
         internal void DecreaseCount(int amt)
         {
@@ -40,7 +40,15 @@ namespace Assets.Core.Scripts.Inventories
             data.Write( Count );
             data.Write( StackWeight );
 
-            data.Write( Item.ToSerial( ) );
+            if(Item is not null)
+            {
+                data.Write( Item.ToSerial( ) );
+            }
+            else
+            {
+                Item tmpItem = Item.EMPTY;
+                data.Write( tmpItem.ToSerial( ) );
+            }
 
             return data;
         }
@@ -50,7 +58,7 @@ namespace Assets.Core.Scripts.Inventories
             string name = data.ReadString( );
             string desc = data.ReadString( );
             int count = data.ReadInt( );
-            int weight = data.ReadInt( );
+            float weight = data.ReadFloat( );
 
             Item item = Item.FromSerial( data );
 
@@ -70,10 +78,10 @@ namespace Assets.Core.Scripts.Inventories
             {
                 return new ItemStack( )
                 {
-                    Item = null,
+                    Item = Item.EMPTY,
                     Count = 0,
                     StackName = "NULL",
-                    StackDescription = null,
+                    StackDescription = "NULL",
                     StackWeight = 0,
                 };
             }

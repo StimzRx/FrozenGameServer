@@ -266,7 +266,7 @@ namespace Core.Scripts.Singletons
                     catch ( Exception ex )
                     {
                         Debug.LogError( "Critical Error in GameServer.UnityTick:"+ex.ToString(  ) );
-                        //NetClients.Clear(  );
+                        NetClients.Clear(  );
                         return;
                     }
                 }

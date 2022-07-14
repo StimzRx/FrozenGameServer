@@ -54,6 +54,7 @@ namespace Core.Scripts.Registries
 
             // Inventory
             { PacketRegistryEntry.Create( typeof( SetupInventoryPacket ) ) },
+            { PacketRegistryEntry.Create( typeof( SetInventorySlotPacket ) ) },
         };
 
 

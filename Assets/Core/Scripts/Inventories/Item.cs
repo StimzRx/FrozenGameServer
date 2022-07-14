@@ -14,9 +14,9 @@ namespace Assets.Core.Scripts.Inventories
     [ItemType("core.items", "empty")]
     public class Item : Serializable<Item>
     {
-        public string Name { get; protected set; }
-        public int MaxStackSize { get; protected set; }
-        public int Weight { get; protected set; }
+        public string Name { get; set; }
+        public int MaxStackSize { get; set; }
+        public float Weight { get; set; }
 
         public SerialData ToSerial( )
         {
@@ -29,6 +29,19 @@ namespace Assets.Core.Scripts.Inventories
         {
             Identifier ident = data.ReadIdentifier( );
             return ItemRegistry.CreateItem( ident );
+        }
+
+        public static Item EMPTY
+        {
+            get
+            {
+                return new Item( )
+                {
+                    Name = "",
+                    MaxStackSize = 0,
+                    Weight = 0,
+                };
+            }
         }
     }
 }
